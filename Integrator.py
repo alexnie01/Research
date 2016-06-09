@@ -62,15 +62,22 @@ def point_run(x0, p0, t, dt):
     time = 0
     x = x0
     p = p0
-    data = np.array([[x0, p0]])
+    data = np.array([[x0, p0, time]])
     while time <= t:
         x, p, time = step(dt, x, p, time)
-        data = np.append(data, [[x, p]], axis=0)
+        data = np.append(data, [[x, p, time]], axis=0)
     return data
     
-def hline_run(n, xmin, xmax, y, t, dt):
+def hline_run(n, xmin, xmax, p, t, dt):
     ''' simulate trials for a row of points '''
-    pass
+    points = np.arange(xmin, xmax, float(xmax-xmin)/n)
+    points = map(lambda a: (a,p), points)
+    data = []
+    for point in points:
+        point_data = point_run(point[0], point[1], t, dt)
+        data.append(point_data)
+    data = np.array(data)
+    return data
 def vline_run(n, x, ymin, ymax, t, dt):
     ''' simulate trials for a column of points '''
     pass
@@ -78,5 +85,9 @@ def square_run(n, m, xmin, xmax, ymin, ymax, t, dt):
     ''' simulate trials for a square of n x m points '''
     pass
 if __name__ == "__main__":
-    data = point_run(0,.1, 10, .001)
-    plt.plot(data[:, 0], data[:, 1])
+#    data = point_run(0,.1, 10, .001)
+#    plt.plot(data[:, 0], data[:, 1])
+    data = hline_run(5, 0, .05, .05, 10, .1)
+    for i in range(0, 5):
+        plt.plot(data[i, :, 0], data[i, :, 1])
+    
