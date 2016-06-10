@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import pdb
 
 # save file for data
-filename = quad_int
+filename = "quad_int"
 
 # integrator coefficients (fourth order)
 prefactor = 1./(2 - np.power(2, 1./3))
@@ -56,7 +56,7 @@ def step(dt, x0, p0, time):
     assert(len(c) == len(d))
     for i in range(0, len(c)):
         x += dt * c[i] * dx.subs(P, p)
-        if np.abs(x) > a:
+        if x >= a + wx.subs(T, t) or x <= - a - wx.subs(T, t):
             p = -p - 2 * wv.subs(T, t)
         p += dt * d[i] * dp.subs(X, x)
         t += dt * 2

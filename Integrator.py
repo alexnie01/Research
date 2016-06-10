@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 import pdb
 
 # save file for data
-filename = r"cubic"
+filename = "cubic"
 
 # integrator coefficients (fourth order)
 prefactor = 1./(2 - np.power(2, 1./3))
