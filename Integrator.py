@@ -69,7 +69,8 @@ def point_run(x0, p0, t, dt):
     return data
     
 def hline_run(n, xmin, xmax, p, t, dt):
-    ''' simulate trials for a row of points '''
+    ''' simulate trials for a row of points. 
+        access time slices with data[:, t] '''
     points = np.arange(xmin, xmax, float(xmax-xmin)/n)
     points = map(lambda a: (a,p), points)
     data = []
@@ -78,16 +79,36 @@ def hline_run(n, xmin, xmax, p, t, dt):
         data.append(point_data)
     data = np.array(data)
     return data
-def vline_run(n, x, ymin, ymax, t, dt):
-    ''' simulate trials for a column of points '''
-    pass
-def square_run(n, m, xmin, xmax, ymin, ymax, t, dt):
+def vline_run(n, x, pmin, pmax, t, dt):
+    ''' simulate trials for a column of points 
+        access time slices with data[:, t]'''
+    points = np.arange(pmin, pmax, float(pmax-pmin)/n)
+    points = map(lambda a: (x,a), points)
+    data = []
+    for point in points:
+        point_data = point_run(point[0], point[1], t, dt)
+        data.append(point_data)
+    data = np.array(data)
+    return data
+def square_run(n, m, xmin, xmax, pmin, pmax, t, dt):
     ''' simulate trials for a square of n x m points '''
-    pass
+    data = []
+    for p in np.arange(pmin, pmax, (pmax-pmin)/m):
+        line_data = hline_run(n, xmin, xmax, p, t, dt)
+        data.append(line_data)
+    pdb.set_trace()
 if __name__ == "__main__":
+    # run for a single point
 #    data = point_run(0,.1, 10, .001)
 #    plt.plot(data[:, 0], data[:, 1])
-    data = hline_run(5, 0, .05, .05, 10, .1)
-    for i in range(0, 5):
-        plt.plot(data[i, :, 0], data[i, :, 1])
+    # run for a line of points
+    data = hline_run(5, 0, .1, .05, 10, .1)
+    # plot by initial point
+#    for i in range(0, 5):
+#        plt.plot(data[i, :, 0], data[i, :, 1])
+    # plot by time slice
+    for i in range(len(data[0, :, 2])):
+        plt.plot(data[:, i, 0], data[:, i, 1])
+#    data = square_run(2, 2, 0, .1, 0, .1, 1, .1)
+    np.save(filename, data)
     
