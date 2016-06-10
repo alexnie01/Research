@@ -8,11 +8,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
-filename = 'raw.npy'
-movie_name = 'line.mp4'
+filename = 'cubic.npy'
+movie_name = 'cubic.mp4'
 
-xlim = [0, 10]
-ylim = [0, 10]
+xlim = [-2, 2]
+ylim = [-3, 3]
 class Animator:
     def __init__(self, filename):
         self.data = np.load(filename)

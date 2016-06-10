@@ -4,18 +4,17 @@ Created on Thu Jun  9 12:33:44 2016
 
 @author: anie
 
-Run simulation using a fourth-order symplectic integrator and then export to
-csv
+Run inverted harmonic potential in a boxsimulation using a fourth-order 
+symplectic integrator and then export to .npy
 """
 
 import numpy as np
-import pandas as pd
 from sympy import *
 import matplotlib.pyplot as plt
 import pdb
 
 # save file for data
-filename = r"cubic"
+filename = quad_int
 
 # integrator coefficients (fourth order)
 prefactor = 1./(2 - np.power(2, 1./3))
@@ -34,11 +33,15 @@ omega = 1
 delta = .1
 
 # potential function
-X, P = symbols('X P')
+X, P, T = symbols('X P T')
 # inverted harmonic
-#U = - .5 * k * X ** 2
+U = - .5 * k * X ** 2
 # cubic
-U = - a * (X**3/3. - X ** 2/2.)
+#U = a * (X**3/3. - X ** 2/2.)
+
+# positive wall position as a function of time
+wx = sin(omega * T)
+wv = diff(wx, T)
 
 # Hamiltonian (inverted harmonic oscillator)
 H = .5*P**2/m + U
@@ -53,6 +56,8 @@ def step(dt, x0, p0, time):
     assert(len(c) == len(d))
     for i in range(0, len(c)):
         x += dt * c[i] * dx.subs(P, p)
+        if np.abs(x) > a:
+            p = -p - 2 * wv.subs(T, t)
         p += dt * d[i] * dp.subs(X, x)
         t += dt * 2
     return (x, p, t)
