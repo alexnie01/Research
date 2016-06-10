@@ -10,12 +10,17 @@ import matplotlib.animation as animation
 
 filename = 'raw.npy'
 movie_name = 'line.mp4'
+
+xlim = [0, 10]
+ylim = [0, 10]
 class Animator:
     def __init__(self, filename):
         self.data = np.load(filename)
         print "data imported"
         self.fig = plt.figure('fig')
         self.frame = plt.scatter(self.data[:, 0, 0], self.data[:, 0, 1])
+        plt.xlim(xlim)
+        plt.ylim(ylim)
         # self.frame.set_array()
         self.n = len(self.data)
     # plot updating function    
