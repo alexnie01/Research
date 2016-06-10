@@ -56,12 +56,12 @@ def step(dt, x0, p0, time):
     assert(len(c) == len(d))
     for i in range(0, len(c)):
         x += dt * c[i] * dx.subs(P, p)
-        if np.abs(x) >= np.abs(a + wx.subs(T, t)):
-            # need to correct p < v error
-            p = - p + 2 * wv.subs(T, t)
-        t += dt
-        p += dt * d[i] * dp.subs(X, x)
-        t += dt
+#        if np.abs(x) >= np.abs(a + wx.subs(T, t)):
+#            # need to correct p < v error
+#            p = - p + 2 * wv.subs(T, t)
+#        t += dt
+#        p += dt * d[i] * dp.subs(X, x)
+#        t += dt
     return (x, p, t)
     
 def point_run(x0, p0, t, dt):
@@ -97,24 +97,28 @@ def vline_run(n, x, pmin, pmax, t, dt):
     points = np.arange(pmin, pmax, float(pmax-pmin)/n)
     points = map(lambda a: (x,a), points)
     data = []
+    pt = 1
+    print "starting runs"
     for point in points:
         point_data = point_run(point[0], point[1], t, dt)
         data.append(point_data)
+        print "finished point {}".format(pt)
+        pt += 1
     data = np.array(data)
     return data
 def square_run(n, m, xmin, xmax, pmin, pmax, t, dt):
     ''' simulate trials for a square of n x m points '''
-    data = []
-    for p in np.arange(pmin, pmax, (pmax-pmin)/m):
+    data = hline_run(n, xmin, xmax, pmin, t, dt)
+    for p in np.arange(pmin+(pmax-pmin)/m, pmax, (pmax-pmin)/m):
         line_data = hline_run(n, xmin, xmax, p, t, dt)
-        data.append(line_data)
-    pdb.set_trace()
+        data = np.append(data, line_data, axis=0)
+    return data
 if __name__ == "__main__":
     # run for a single point
 #    data = point_run(0,.1, 10, .001)
 #    plt.plot(data[:, 0], data[:, 1])
     # run for a line of points
-    data = hline_run(50, -.3, .3, 0, 100, .01)
+    data = vline_run(25, .1, -.1, .1, 100, .01)
     # plot by initial point
 #    for i in range(0, 5):
 #        plt.plot(data[i, :, 0], data[i, :, 1])

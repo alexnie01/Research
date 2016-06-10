@@ -75,13 +75,9 @@ def hline_run(n, xmin, xmax, p, t, dt):
     points = np.arange(xmin, xmax, float(xmax-xmin)/n)
     points = map(lambda a: (a,p), points)
     data = []
-    pt = 1
-    print "starting runs"
     for point in points:
         point_data = point_run(point[0], point[1], t, dt)
         data.append(point_data)
-        print "finished calculations for {}".format(pt)
-        pt += 1
     data = np.array(data)
 
     return data
@@ -99,11 +95,15 @@ def vline_run(n, x, pmin, pmax, t, dt):
 def square_run(n, m, xmin, xmax, pmin, pmax, t, dt):
     ''' simulate trials for a square of n x m points '''
     data = hline_run(n, xmin, xmax, pmin, t, dt)
+    pt = 1
     for p in np.arange(pmin+(pmax-pmin)/m, pmax, (pmax-pmin)/m):
         line_data = hline_run(n, xmin, xmax, p, t, dt)
         data = np.append(data, line_data, axis=0)
+        print "finished row {}".format(pt)
+        pt += 1
     return data
 if __name__ == "__main__":
+    print "running trials"
     # run for a single point
 #    data = point_run(0,.1, 10, .001)
 #    plt.plot(data[:, 0], data[:, 1])
@@ -115,7 +115,7 @@ if __name__ == "__main__":
     # plot by time slice
 #    for i in range(len(data[0, :, 2])):
 #        plt.plot(data[:, i, 0], data[:, i, 1])
-    data = square_run(4, 4, 0, .1, 0, .1, 10, .01)
+    data = square_run(15, 15, .8, 1.2, -.3, .3, 1000, .1)
     np.save(filename, data)
     data = None
     
