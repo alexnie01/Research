@@ -11,13 +11,13 @@ import matplotlib.animation as animation
 filename = 'cubic.npy'
 movie_name = 'cubic.mp4'
 
-xlim = [-2, 2]
-ylim = [-3, 3]
+xlim = [-.7, .7]
+ylim = [-1, 1]
 class Animator:
     def __init__(self, filename):
         self.data = np.load(filename)
         print "data imported"
-        self.fig = plt.figure('fig')
+        self.fig = plt.figure('Quadratic Approximation')
         self.frame = plt.scatter(self.data[:, 0, 0], self.data[:, 0, 1])
         plt.xlim(xlim)
         plt.ylim(ylim)
@@ -37,7 +37,8 @@ if __name__ == '__main__':
     movie = Animator(filename)
     movie.animate()
     print "saving movie"
-    movie.anim.save(movie_name, fps=30, extra_args = ['-vcodec', 'libx264'])
+    movie.anim.save(movie_name, fps=10, extra_args = ['-vcodec', 'libx264'])
     print "Done!"
+    movie = None
     
     

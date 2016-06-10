@@ -29,7 +29,7 @@ moving_walls = True
 # constants (spring constant, mass, box size, wall frequency, wall amplitude)
 k = 1
 m = 1
-a = .5
+a = 1
 omega = 1
 delta = .1
 
@@ -53,8 +53,9 @@ def step(dt, x0, p0, time):
     assert(len(c) == len(d))
     for i in range(0, len(c)):
         x += dt * c[i] * dx.subs(P, p)
+        t += dt
         p += dt * d[i] * dp.subs(X, x)
-        t += dt * 2
+        t += dt
     return (x, p, t)
     
 def point_run(x0, p0, t, dt):
@@ -97,24 +98,24 @@ def vline_run(n, x, pmin, pmax, t, dt):
     return data
 def square_run(n, m, xmin, xmax, pmin, pmax, t, dt):
     ''' simulate trials for a square of n x m points '''
-    data = []
-    for p in np.arange(pmin, pmax, (pmax-pmin)/m):
+    data = hline_run(n, xmin, xmax, pmin, t, dt)
+    for p in np.arange(pmin+(pmax-pmin)/m, pmax, (pmax-pmin)/m):
         line_data = hline_run(n, xmin, xmax, p, t, dt)
-        data.append(line_data)
-    pdb.set_trace()
+        data = np.append(data, line_data, axis=0)
+    return data
 if __name__ == "__main__":
     # run for a single point
 #    data = point_run(0,.1, 10, .001)
 #    plt.plot(data[:, 0], data[:, 1])
     # run for a line of points
-    data = hline_run(50, -.3, .3, 0, 500, .1)
-    # plot by initial point
-#    for i in range(0, 5):
+#    data = hline_run(50, -.3, .3, 0, 5000, 1)
+#     plot by initial point
+#    for i in range(0, len(data)):
 #        plt.plot(data[i, :, 0], data[i, :, 1])
     # plot by time slice
-    for i in range(len(data[0, :, 2])):
-        plt.plot(data[:, i, 0], data[:, i, 1])
-#    data = square_run(2, 2, 0, .1, 0, .1, 1, .1)
+#    for i in range(len(data[0, :, 2])):
+#        plt.plot(data[:, i, 0], data[:, i, 1])
+    data = square_run(4, 4, 0, .1, 0, .1, 10, .01)
     np.save(filename, data)
     data = None
     

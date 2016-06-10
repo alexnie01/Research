@@ -30,7 +30,7 @@ k = 1
 m = 1
 a = .5
 omega = 1
-delta = .1
+delta = 1./16
 
 # potential function
 X, P, T = symbols('X P T')
@@ -40,7 +40,7 @@ U = - .5 * k * X ** 2
 #U = a * (X**3/3. - X ** 2/2.)
 
 # positive wall position as a function of time
-wx = sin(omega * T)
+wx = delta * sin(omega * T)
 wv = diff(wx, T)
 
 # Hamiltonian (inverted harmonic oscillator)
@@ -56,10 +56,12 @@ def step(dt, x0, p0, time):
     assert(len(c) == len(d))
     for i in range(0, len(c)):
         x += dt * c[i] * dx.subs(P, p)
-        if x >= a + wx.subs(T, t) or x <= - a - wx.subs(T, t):
-            p = -p - 2 * wv.subs(T, t)
+        if np.abs(x) >= np.abs(a + wx.subs(T, t)):
+            # need to correct p < v error
+            p = - p + 2 * wv.subs(T, t)
+        t += dt
         p += dt * d[i] * dp.subs(X, x)
-        t += dt * 2
+        t += dt
     return (x, p, t)
     
 def point_run(x0, p0, t, dt):
@@ -112,7 +114,7 @@ if __name__ == "__main__":
 #    data = point_run(0,.1, 10, .001)
 #    plt.plot(data[:, 0], data[:, 1])
     # run for a line of points
-    data = hline_run(50, -.3, .3, 0, 500, .1)
+    data = hline_run(50, -.3, .3, 0, 100, .01)
     # plot by initial point
 #    for i in range(0, 5):
 #        plt.plot(data[i, :, 0], data[i, :, 1])
