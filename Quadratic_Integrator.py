@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import pdb
 
 # save file for data
-filename = "quad_int"
+filename = "quad_int_long"
 
 # integrator coefficients (fourth order)
 prefactor = 1./(2 - np.power(2, 1./3))
@@ -55,13 +55,17 @@ def step(dt, x0, p0, time):
     t = time
     assert(len(c) == len(d))
     for i in range(0, len(c)):
-        x += dt * c[i] * dx.subs(P, p)
-#        if np.abs(x) >= np.abs(a + wx.subs(T, t)):
-#            # need to correct p < v error
-#            p = - p + 2 * wv.subs(T, t)
-#        t += dt
-#        p += dt * d[i] * dp.subs(X, x)
-#        t += dt
+        Dx = dt * c[i] * dx.subs(P, p)
+        try:
+            if np.abs(x+Dx) >= np.abs(a + wx.subs(T,t)):
+                p = -p + 2 * wv.subs(T,t)
+            else:
+                x += Dx
+            t += dt
+            p += dt * d[i] * dp.subs(X, x) 
+            t += dt
+        except:
+            pdb.set_trace()
     return (x, p, t)
     
 def point_run(x0, p0, t, dt):
@@ -123,9 +127,9 @@ if __name__ == "__main__":
 #    for i in range(0, 5):
 #        plt.plot(data[i, :, 0], data[i, :, 1])
     # plot by time slice
-    for i in range(len(data[0, :, 2])):
-        plt.plot(data[:, i, 0], data[:, i, 1])
-#    data = square_run(2, 2, 0, .1, 0, .1, 1, .1)
+#    for i in range(len(data[0, :, 2])):
+#        plt.plot(data[:, i, 0], data[:, i, 1])
+    data = square_run(14, 14, 0, .2, 0, .2, 1000, .1)
     np.save(filename, data)
     data = None
     

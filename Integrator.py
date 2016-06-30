@@ -4,7 +4,7 @@ Created on Thu Jun  9 12:33:44 2016
 
 @author: anie
 
-Methods for performing fourth-order symplectic integration given an initial
+Methods for performing symplectic integration given an initial
 array of points. Main method runs simulation using a fourth-order symplectic 
 integrator and then exports to <filename>.npy
 """
@@ -18,11 +18,13 @@ from Configuration import filename, walls, dx, dp, X, P, T
 
 if walls:
     from Configuration import a, wall_x, wall_v
-
-""" Fourth Order Symplectic Integrator Coefficients """
-prefactor = 1./(2 - np.power(2, 1./3))
-c = .5 * prefactor * np.array([1, 1-np.power(2, 1./3), 1-np.power(2, 1./3), 1])
-d = prefactor * np.array([1, -np.power(2, 1./3), 1, 0])
+""" Second Order Symplectic Integrator Coefficients """
+c = np.array([0,1])
+d = np.array([.5, .5])
+#""" Fourth Order Symplectic Integrator Coefficients """
+#prefactor = 1./(2 - np.power(2, 1./3))
+#c = .5 * prefactor * np.array([1, 1-np.power(2, 1./3), 1-np.power(2, 1./3), 1])
+#d = prefactor * np.array([1, -np.power(2, 1./3), 1, 0])
 
 def step(dt, x0, p0, time):
     ''' advance simulation by timesteps dt'''
@@ -49,9 +51,9 @@ def wall_step(dt, x0, p0, time):
         x_step = dt * c[i] * dx.subs(P, p)
         x += x_step
         # collision detection
-        if np.abs(x) >= np.abs(wall_x.subs(T, t)):
+        if np.abs(x) >= np.abs(wall_x(t)):
             x -= x_step
-            p = np.sign(x) * 2 * wall_v.subs(T, t) - p
+            p = np.sign(x) * 2 * wall_v(t) - p
         t += dt
         p += dt * d[i] * dp.subs(X, x)
         t += dt
@@ -122,8 +124,8 @@ if __name__ == "__main__":
 
 
     # run for square of points
-#    data = square_run(20, 20, .8, 1.3, -.3, .3, 4000, .4)
-    data = square_run(10, 10, .05, .1, .1, .2, 200, .01)
+#    data = square_run(30, 30, .94, .96, -.03, .02, 1500, 1)
+    data = square_run(40, 40, .94, .96, -.03, -.02, 1000, .1)
     np.save(filename, data)
     data = None
     

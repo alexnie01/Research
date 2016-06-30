@@ -17,15 +17,15 @@ from sympy import *
 import pdb
 from Configuration import walls, wall_x, wall_v, k, m
 
-filename = 'quad_solver_1000_fast'
+filename = 'quad_solver_1000_line_o1'
 
-N = 50
-M = 20
+N = 10
+M = 100
 
-xmin = .4
-xmax = .405
-pmin = .005
-pmax = .01
+xmin = -.5
+xmax = -.495
+pmin = 1.
+pmax = 2.
 
 dt = .01
 
@@ -37,7 +37,7 @@ def build_pos(x0, p0, T):
 def build_mom(x0, p0, T):
     return (lambda t: p0 * np.cosh(np.sqrt(k/m) * (t-T)) +\
                     np.sqrt(k * m) * x0 * np.sinh(np.sqrt(k/m) * (t-T)))    
-def step(pt_id, time, repeat = False):
+def step(pt_id, time):
     particle = pt_arr[pt_id]
     timeslice = np.array([particle[0](time), particle[1](time), time])
     if np.abs(timeslice[0]) >= np.abs(wall_x(time)):
@@ -45,23 +45,21 @@ def step(pt_id, time, repeat = False):
         f = lambda t: particle[0](t) - np.sign(particle[0](t)) * wall_x(t)
         # numerically calculate collision time
         t_col = brenth(f, time - dt, time)
-        if repeat:
-            try:
-                t_col1 = brenth(f, time - dt, t_col)
-            except:
-                pass
+        # particle and wall collide multiple times within interval (maybe)
+#        if repeat:
+#            try:
+#                t_col1 = brenth(f, time - dt, t_col)
+#            except:
+#                pass
         # calculate collision position and momentum
         x_col = particle[0](t_col)
         p_col = 2 * m * np.sign(x_col) * wall_v(t_col) - particle[1](t_col)
         # build new particle
         new_particle = (build_pos(x_col, p_col, t_col), 
                         build_mom(x_col, p_col, t_col), pt_id)
-        if repeat:
-            pdb.set_trace()
-            new
         pt_arr[pt_id] = new_particle
         # may cause an infinite loop?
-        return step(pt_id, time, True)
+        return step(pt_id, time)
     return timeslice
 
 if __name__ == "__main__":
@@ -79,7 +77,7 @@ if __name__ == "__main__":
     for pt_id in np.arange(0, N * M + 1):
         particle = pt_arr[pt_id]
         pt_data = np.array((particle[0](0), particle[1](0), 0))
-        for t in np.arange(dt, 150, dt):
+        for t in np.arange(dt, 1000, dt):
             timeslice = step(pt_id, t)
             pt_data = np.vstack((pt_data, timeslice))
         data.append(pt_data)
